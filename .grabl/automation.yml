@@ -35,7 +35,7 @@ build:
       script: |
         SONARCLOUD_CODE_ANALYSIS_CREDENTIAL=$SONARCLOUD_CREDENTIAL \
           bazel run @graknlabs_dependencies//tool/sonarcloud:code-analysis -- \
-          --project-key=graknlabs_grakn_core \
+          --project-key=graknlabs_grakn_core \ 
           --branch=$GRABL_BRANCH --commit-id=$GRABL_COMMIT
     dependency-analysis:
       machine: graknlabs-ubuntu-20.04-java11
