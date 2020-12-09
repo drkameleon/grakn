@@ -77,7 +77,7 @@ build:
         branch: wip-reproduce-rpm-issue
       dependencies: [build, build-dependency, test-unit, test-integration, test-behaviour]
       script: |
-        export DEPLOY_APT_USERNAME=$REPO_GRAKN_USERNAME
+        export DEPLOY_APT_USERNAME=$REPO_GRAKN_USERNAME  
         export DEPLOY_APT_PASSWORD=$REPO_GRAKN_PASSWORD
         bazel test //test/assembly:assembly --test_output=errors
     test-assembly-docker:
