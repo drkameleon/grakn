@@ -121,7 +121,6 @@ build:
       filter:
         owner: graknlabs
         branch: wip-reproduce-rpm-issue
-      dependencies: [test-assembly-linux-targz]
       script: |
         export DEPLOY_RPM_USERNAME=$REPO_GRAKN_USERNAME
         export DEPLOY_RPM_PASSWORD=$REPO_GRAKN_PASSWORD
