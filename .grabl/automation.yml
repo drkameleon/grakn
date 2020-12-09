@@ -42,104 +42,104 @@ build:
       script: |
         bazel run @graknlabs_dependencies//grabl/analysis:dependency-analysis
   correctness:
-    build:
-      machine: graknlabs-ubuntu-20.04-java11
-      script: |
-        bazel build //...
-        bazel run @graknlabs_dependencies//tool/checkstyle:test-coverage
-        bazel test $(bazel query 'kind(checkstyle_test, //...)') --test_output=errors
-    build-dependency:
-      machine: graknlabs-ubuntu-20.04-java11
-      script: |
-        dependencies/maven/update.sh
-        git diff --exit-code dependencies/maven/artifacts.snapshot
-        bazel run @graknlabs_dependencies//tool/unuseddeps:unused-deps -- list
-    test-unit:
-      machine: graknlabs-ubuntu-20.04-java11
-      script: |
-        bazel test //common/... --test_output=errors
-        bazel test //pattern/... --test_output=errors
-        bazel test //reasoner/... --test_output=errors
-    test-integration:
-      machine: graknlabs-ubuntu-20.04-java11
-      script: |
-        bazel test //test/integration/... --test_output=errors
-    test-behaviour:
-      machine: graknlabs-ubuntu-20.04-java11
-      script: |
-        bazel test //test/behaviour/connection/... --test_output=errors
-        bazel test //test/behaviour/concept/... --test_output=errors
-        bazel test //test/behaviour/graql/language/define/... --test_output=errors
-    test-assembly-linux-targz:
-      machine: graknlabs-ubuntu-20.04-java11
-      filter:
-        owner: graknlabs
-        branch: master
-      dependencies: [build, build-dependency, test-unit, test-integration, test-behaviour]
-      script: |
-        export DEPLOY_APT_USERNAME=$REPO_GRAKN_USERNAME
-        export DEPLOY_APT_PASSWORD=$REPO_GRAKN_PASSWORD
-        bazel test //test/assembly:assembly --test_output=errors
-    test-assembly-docker:
-      machine: graknlabs-ubuntu-20.04-java11
-      filter:
-        owner: graknlabs
-        branch: master
-      dependencies: [build, build-dependency, test-unit, test-integration, test-behaviour]
-      script: |
-        bazel test //test/assembly:docker --test_output=streamed
-    deploy-artifact-snapshot:
-      machine: graknlabs-ubuntu-20.04-java11
-      filter:
-        owner: graknlabs
-        branch: master
-      dependencies: [test-assembly-linux-targz]
-      script: |
-        export DEPLOY_ARTIFACT_USERNAME=$REPO_GRAKN_USERNAME
-        export DEPLOY_ARTIFACT_PASSWORD=$REPO_GRAKN_PASSWORD
-        bazel run --define version=$(git rev-parse HEAD) //server:deploy-linux-targz -- snapshot
-        bazel run --define version=$(git rev-parse HEAD) //server:deploy-mac-zip -- snapshot
-        bazel run --define version=$(git rev-parse HEAD) //server:deploy-windows-zip -- snapshot
-    deploy-apt-snapshot:
-      machine: graknlabs-ubuntu-20.04-java11
-      filter:
-        owner: graknlabs
-        branch: master
-      dependencies: [test-assembly-linux-targz]
-      script: |
-        export DEPLOY_APT_USERNAME=$REPO_GRAKN_USERNAME
-        export DEPLOY_APT_PASSWORD=$REPO_GRAKN_PASSWORD
-        pyenv install 3.7.9
-        pyenv global 3.7.9
-        sudo unlink /usr/bin/python3
-        sudo ln -s $(which python3) /usr/bin/python3
-        sudo ln -s /usr/share/pyshared/lsb_release.py /opt/pyenv/versions/3.7.9/lib/python3.7/site-packages/lsb_release.py
-        bazel run --define version=$(git rev-parse HEAD) //server:deploy-apt -- snapshot
-        bazel run --define version=$(git rev-parse HEAD) //:deploy-apt -- snapshot
+    # build:
+    #   machine: graknlabs-ubuntu-20.04-java11
+    #   script: |
+    #     bazel build //...
+    #     bazel run @graknlabs_dependencies//tool/checkstyle:test-coverage
+    #     bazel test $(bazel query 'kind(checkstyle_test, //...)') --test_output=errors
+    # build-dependency:
+    #   machine: graknlabs-ubuntu-20.04-java11
+    #   script: |
+    #     dependencies/maven/update.sh
+    #     git diff --exit-code dependencies/maven/artifacts.snapshot
+    #     bazel run @graknlabs_dependencies//tool/unuseddeps:unused-deps -- list
+    # test-unit:
+    #   machine: graknlabs-ubuntu-20.04-java11
+    #   script: |
+    #     bazel test //common/... --test_output=errors
+    #     bazel test //pattern/... --test_output=errors
+    #     bazel test //reasoner/... --test_output=errors
+    # test-integration:
+    #   machine: graknlabs-ubuntu-20.04-java11
+    #   script: |
+    #     bazel test //test/integration/... --test_output=errors
+    # test-behaviour:
+    #   machine: graknlabs-ubuntu-20.04-java11
+    #   script: |
+    #     bazel test //test/behaviour/connection/... --test_output=errors
+    #     bazel test //test/behaviour/concept/... --test_output=errors
+    #     bazel test //test/behaviour/graql/language/define/... --test_output=errors
+    # test-assembly-linux-targz:
+    #   machine: graknlabs-ubuntu-20.04-java11
+    #   filter:
+    #     owner: graknlabs
+    #     branch: master
+    #   dependencies: [build, build-dependency, test-unit, test-integration, test-behaviour]
+    #   script: |
+    #     export DEPLOY_APT_USERNAME=$REPO_GRAKN_USERNAME
+    #     export DEPLOY_APT_PASSWORD=$REPO_GRAKN_PASSWORD
+    #     bazel test //test/assembly:assembly --test_output=errors
+    # test-assembly-docker:
+    #   machine: graknlabs-ubuntu-20.04-java11
+    #   filter:
+    #     owner: graknlabs
+    #     branch: master
+    #   dependencies: [build, build-dependency, test-unit, test-integration, test-behaviour]
+    #   script: |
+    #     bazel test //test/assembly:docker --test_output=streamed
+    # deploy-artifact-snapshot:
+    #   machine: graknlabs-ubuntu-20.04-java11
+    #   filter:
+    #     owner: graknlabs
+    #     branch: master
+    #   dependencies: [test-assembly-linux-targz]
+    #   script: |
+    #     export DEPLOY_ARTIFACT_USERNAME=$REPO_GRAKN_USERNAME
+    #     export DEPLOY_ARTIFACT_PASSWORD=$REPO_GRAKN_PASSWORD
+    #     bazel run --define version=$(git rev-parse HEAD) //server:deploy-linux-targz -- snapshot
+    #     bazel run --define version=$(git rev-parse HEAD) //server:deploy-mac-zip -- snapshot
+    #     bazel run --define version=$(git rev-parse HEAD) //server:deploy-windows-zip -- snapshot
+    # deploy-apt-snapshot:
+    #   machine: graknlabs-ubuntu-20.04-java11
+    #   filter:
+    #     owner: graknlabs
+    #     branch: master
+    #   dependencies: [test-assembly-linux-targz]
+    #   script: |
+    #     export DEPLOY_APT_USERNAME=$REPO_GRAKN_USERNAME
+    #     export DEPLOY_APT_PASSWORD=$REPO_GRAKN_PASSWORD
+    #     pyenv install 3.7.9
+    #     pyenv global 3.7.9
+    #     sudo unlink /usr/bin/python3
+    #     sudo ln -s $(which python3) /usr/bin/python3
+    #     sudo ln -s /usr/share/pyshared/lsb_release.py /opt/pyenv/versions/3.7.9/lib/python3.7/site-packages/lsb_release.py
+    #     bazel run --define version=$(git rev-parse HEAD) //server:deploy-apt -- snapshot
+    #     bazel run --define version=$(git rev-parse HEAD) //:deploy-apt -- snapshot
     deploy-rpm-snapshot:
       machine: graknlabs-ubuntu-20.04-java11
       filter:
         owner: graknlabs
-        branch: master
+        branch: wip-reproduce-rpm-issue
       dependencies: [test-assembly-linux-targz]
       script: |
         export DEPLOY_RPM_USERNAME=$REPO_GRAKN_USERNAME
         export DEPLOY_RPM_PASSWORD=$REPO_GRAKN_PASSWORD
         bazel run --define version=$(git rev-parse HEAD) //server:deploy-rpm -- snapshot
         bazel run --define version=$(git rev-parse HEAD) //:deploy-rpm -- snapshot
-    test-deployment-apt:
-      machine: graknlabs-ubuntu-20.04-java11
-      filter:
-        owner: graknlabs
-        branch: master
-      dependencies: [deploy-apt-snapshot]
-      script: |
-        bazel test //test/deployment:apt --action_env=GRABL_COMMIT --test_output=streamed
+    # test-deployment-apt:
+    #   machine: graknlabs-ubuntu-20.04-java11
+    #   filter:
+    #     owner: graknlabs
+    #     branch: master
+    #   dependencies: [deploy-apt-snapshot]
+    #   script: |
+    #     bazel test //test/deployment:apt --action_env=GRABL_COMMIT --test_output=streamed
     test-deployment-rpm:
       machine: graknlabs-centos-8.2
       filter:
         owner: graknlabs
-        branch: master
+        branch: wip-reproduce-rpm-issue
       dependencies: [deploy-rpm-snapshot]
       script: |
         bazel test //test/deployment:rpm --action_env=GRABL_COMMIT --test_output=streamed
